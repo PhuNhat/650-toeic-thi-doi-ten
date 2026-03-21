@@ -2,6 +2,7 @@
 
 # Token Ring 6 Servers - Start Script
 # Reads environment variables and starts the server
+# Uses pre-compiled .class files from build/ folder
 
 # Get environment variables with defaults
 NODE_ID=${NODE_ID:-1}
@@ -18,31 +19,22 @@ echo "[INFO] MYSQL_URL: $MYSQL_URL"
 echo "[INFO] PEERS: ${PEERS:-'(will be set by PM later)'}"
 echo "=========================================="
 
-# Compile Java files if not already compiled
-if [ ! -d "build/server" ] || [ -z "$(find src/server -name '*.java' -newer build/server -type f 2>/dev/null)" ]; then
-    echo "[COMPILE] Compiling Java files..."
-    
-    # Download MySQL driver if not present
-    if [ ! -f "lib/mysql-connector-java-8.0.33.jar" ]; then
-        echo "[DOWNLOAD] Downloading MySQL JDBC driver..."
-        mkdir -p lib
-        cd lib
-        wget -q https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.33/mysql-connector-java-8.0.33.jar
-        cd ..
-    fi
-    
-    # Compile with MySQL driver in classpath
-    javac -cp build:lib/mysql-connector-java-8.0.33.jar -d build src/server/*.java src/client/*.java 2>&1
-    if [ $? -ne 0 ]; then
-        echo "[ERROR] Compilation failed!"
-        exit 1
-    fi
-    echo "[COMPILE] Done!"
-else
-    echo "[COMPILE] Already compiled, skipping..."
+# Download MySQL driver if not present
+if [ ! -f "lib/mysql-connector-java-8.0.33.jar" ]; then
+    echo "[DOWNLOAD] Downloading MySQL JDBC driver..."
+    mkdir -p lib
+    cd lib
+    wget -q https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.33/mysql-connector-java-8.0.33.jar
+    cd ..
 fi
 
-# Run the server with environment variables
-echo "[START] Starting server..."
+# Verify pre-compiled classes exist
+if [ ! -d "build/server" ]; then
+    echo "[ERROR] Pre-compiled classes not found in build/server"
+    echo "[ERROR] Please run: javac -d build src/server/*.java src/client/*.java"
+    exit 1
+fi
+
+echo "[START] Starting server with pre-compiled classes..."
 export NODE_ID PORT MYSQL_URL PEERS
 java -cp build:lib/mysql-connector-java-8.0.33.jar server.Main
