@@ -8,8 +8,8 @@ public class RoutingTable {
     public RoutingTable(String peers) {
         table = new VirtualCircle[6];
         
-        // Handle empty or partial PEERS
-        if (peers == null || peers.trim().isEmpty()) {
+        // Handle empty, null, or placeholder PEERS
+        if (peers == null || peers.trim().isEmpty() || peers.contains("(will be set by PM later)")) {
             System.out.println("[WARNING] PEERS not set - using localhost defaults");
             peers = "localhost:8080,localhost:8080,localhost:8080,localhost:8080,localhost:8080,localhost:8080";
         }

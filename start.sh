@@ -24,8 +24,14 @@ if [ ! -f "lib/mysql-connector-java-8.0.33.jar" ]; then
     echo "[DOWNLOAD] Downloading MySQL JDBC driver..."
     mkdir -p lib
     cd lib
-    wget -q https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.33/mysql-connector-java-8.0.33.jar
+    if ! wget -q https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.33/mysql-connector-java-8.0.33.jar; then
+        echo "[ERROR] Failed to download MySQL driver"
+        exit 1
+    fi
     cd ..
+    echo "[DOWNLOAD] MySQL driver downloaded successfully"
+else
+    echo "[DOWNLOAD] MySQL driver already exists"
 fi
 
 # Verify pre-compiled classes exist
@@ -37,4 +43,4 @@ fi
 
 echo "[START] Starting server with pre-compiled classes..."
 export NODE_ID PORT MYSQL_URL PEERS
-java -cp build:lib/mysql-connector-java-8.0.33.jar server.Main
+java -cp "build:lib/mysql-connector-java-8.0.33.jar" server.Main
