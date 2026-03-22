@@ -44,6 +44,7 @@ public class NodeHandler implements Runnable {
             } else if ("STATUS".equalsIgnoreCase(message) || "PING".equalsIgnoreCase(message)) {
                 out.println(tokenRing.getStatus());
             } else if (message.startsWith("PRINT|") || message.startsWith("INSERT|")) {
+                logPrintRequest(message);
                 out.println(tokenRing.submitPrintJob(message.substring(message.indexOf('|') + 1)));
             } else if (message.startsWith("CANCEL|") || message.startsWith("DELETE|")) {
                 out.println(tokenRing.submitCancelJob(message.substring(message.indexOf('|') + 1)));
@@ -72,6 +73,15 @@ public class NodeHandler implements Runnable {
             out.println(accepted ? "DA_NHAN_TOKEN" : "BO_QUA_TOKEN");
         } catch (NumberFormatException ex) {
             out.println("LOI|Metadata token khong hop le");
+        }
+    }
+
+    private void logPrintRequest(String message) {
+        String payload = message.substring(message.indexOf('|') + 1);
+        String[] parts = payload.split("\\|", 2);
+        if (parts.length >= 2) {
+            System.out.println("[Node " + nodeId + "] Nhan lenh in job " + parts[0].trim()
+                    + " voi noi dung: " + parts[1].trim());
         }
     }
 }

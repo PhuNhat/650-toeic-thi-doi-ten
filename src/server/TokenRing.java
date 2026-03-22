@@ -71,7 +71,8 @@ public class TokenRing {
 
         pendingJobs.add(request);
         System.out.println("[Node " + nodeId + "] Da dua job in " + request.getJobId()
-                + " vao hang doi tai dong ho Lamport " + requestLamport);
+                + " vao hang doi tai dong ho Lamport " + requestLamport
+                + " | noi dung: " + request.getDocumentContent());
 
         if (hasToken) {
             processPendingJobsLocked();
@@ -162,7 +163,8 @@ public class TokenRing {
             boolean success;
 
             if (request.getOperation() == ProcessData.Operation.PRINT) {
-                System.out.println("[Node " + nodeId + "] Dang xu ly in job " + request.getJobId()
+                System.out.println("[Node " + nodeId + "] Dang in job " + request.getJobId()
+                        + " | noi dung: " + request.getDocumentContent()
                         + " | lamportGui=" + request.getSubmittedLamport()
                         + " | lamportXuLy=" + processedLamport);
                 success = db.recordPrintedJob(request, nodeId, processedLamport, processedAt);
